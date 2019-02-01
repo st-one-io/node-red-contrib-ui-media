@@ -531,21 +531,28 @@
         </div>
         <!-- Layout -->
 
-        <!-- Link -->
+        <!-- Video Opions --->
         <div class="form-row">
-            <label for="node-input-link"><i class="fa fa-link"></i> <span data-i18n="ui_media.config.label.link"></span></label>
-            <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
-                <div style="position: absolute; left: 0px; right: 40px;">
-                    <input style="width:100%" type="text" id="node-input-link" readonly>
-                </div>
-                <div class="btn-group" style="position: absolute; right: 0px; top: 0px;">
-                    <a id="bt-copy" class="editor-button">
-                        <i class="fa fa-clipboard"></i>
-                    </a>
-                </div>
-            </div>
+          <div class="form-row">
+            <label for="node-input-tosidebar"><span data-i18n="ui_media.files.label.video-options"></span></label>
+            <label for="node-input-onstart" style="width:70%">
+              <input type="checkbox" id="node-input-onstart" style="display:inline-block; width:22px; vertical-align:baseline;"><span data-i18n="ui_media.files.label.run-on-start"></span>
+            </label>
+          </div>
+          <div class="form-row">
+            <label ></label>
+            <label for="node-input-showcontrols" style="width:70%">
+              <input type="checkbox" id="node-input-showcontrols" style="display:inline-block; width:22px; vertical-align:baseline;"><span data-i18n="ui_media.files.label.show-controls"></span>
+            </label>
+          </div>
+          <div class="form-row">
+            <label></label>
+            <label for="node-input-loop" style="width:70%">
+              <input type="checkbox" id="node-input-loop" style="display:inline-block; width:22px; vertical-align:baseline;"><span data-i18n="ui_media.files.label.loop"></span>
+            </label>
+          </div>
         </div>
-        <!-- Link -->
+        <!-- Video Opions --->
       </div>
 
       <!-- File Tab -->
@@ -632,27 +639,21 @@
             <progress style="width: 95%; height: 5px" id="progress-upload" value="0" min="0" max="100"></progress>
         </div>
 
-        <!-- Video Opions --->
+        <!-- Link -->
         <div class="form-row">
-          <div class="form-row">
-            <label for="node-input-tosidebar"><span data-i18n="ui_media.files.label.video-options"></span></label>
-            <label for="node-input-onstart" style="width:70%">
-              <input type="checkbox" id="node-input-onstart" style="display:inline-block; width:22px; vertical-align:baseline;"><span data-i18n="ui_media.files.label.run-on-start"></span>
-            </label>
-          </div>
-          <div class="form-row">
-            <label ></label>
-            <label for="node-input-showcontrols" style="width:70%">
-              <input type="checkbox" id="node-input-showcontrols" style="display:inline-block; width:22px; vertical-align:baseline;"><span data-i18n="ui_media.files.label.show-controls"></span>
-            </label>
-          </div>
-          <div class="form-row">
-            <label></label>
-            <label for="node-input-loop" style="width:70%">
-              <input type="checkbox" id="node-input-loop" style="display:inline-block; width:22px; vertical-align:baseline;"><span data-i18n="ui_media.files.label.loop"></span>
-            </label>
-          </div>
+            <label for="node-input-link"><i class="fa fa-link"></i> <span data-i18n="ui_media.config.label.link"></span></label>
+            <div style="display: inline-block; position: relative; width: 70%; height: 20px;">
+                <div style="position: absolute; left: 0px; right: 40px;">
+                    <input style="width:100%" type="text" id="node-input-link" readonly>
+                </div>
+                <div class="btn-group" style="position: absolute; right: 0px; top: 0px;">
+                    <a id="bt-copy" class="editor-button">
+                        <i class="fa fa-clipboard"></i>
+                    </a>
+                </div>
+            </div>
         </div>
+        <!-- Link -->        
 
         <div class="formkk-row" style="text-align: left">
             <label style="padding: 5px"><span data-i18n="ui_media.files.label.preview"></span></label>
@@ -722,12 +723,12 @@
         </dt>
 
         <dd>Is possible to play or pause a video by
-          <code>msg.pause</code>.</dd>
+          <code>msg.play</code>.</dd>
         </dd>
         <dd>
             Options:
             <br>
-            <code>msg.pause:</code>
+            <code>msg.play:</code>
             <code>true</code>,
             <code>false</code>
         </dd>

@@ -4,6 +4,7 @@ var formidable = require('formidable');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
+var gambiarra;
 
 module.exports = function (RED) {
     /* Checks if projects are enabled in the settings and create a path ot it if
@@ -88,7 +89,7 @@ module.exports = function (RED) {
                             });
 
                             return;
-                        }
+                        }https://nodered.org/docs/api/runtime/api#getNode
                         res.status(201).send(success[0]).end();
                     }
 
@@ -397,13 +398,11 @@ module.exports = function (RED) {
                 ui = RED.require("node-red-dashboard")(RED);
             }
             RED.nodes.createNode(this, config);
-
             var node = this;
             var tab, elmStyle;
             var link = null,
             layout = 'adjust';
-
-
+            gambiarra = node;
             var group = RED.nodes.getNode(config.group);
 
             if (!group) {
@@ -441,6 +440,26 @@ module.exports = function (RED) {
           	 */
             function processImageLayout(layout, path) {
                 var HTML = undefined;
+                console.log(node.id);
+                var clickScript = String.raw `
+                <script>
+                      var current_scope = scope;
+
+                      function getImageXY (event, scope) {
+                        var coordinates = {
+                          x: event.clientX,
+                          y: event.clientY
+                        };
+                        var msg = {
+                          payload : coordinates
+                        };
+                          current_scope.send(msg);
+                      }
+                      var imageDiv = document.getElementById("image-div");
+                      imageDiv.onclick = getImageXY;
+
+                </script>
+                `;
 
                 switch (layout) {
 
@@ -457,7 +476,7 @@ module.exports = function (RED) {
                           }
                         </style>
 
-                        <div class="bgimg"></div>`;
+                        <div id="image-div" class="bgimg"></div>`;
                         break;
                     }
 
@@ -474,7 +493,7 @@ module.exports = function (RED) {
                           }
                         </style>
 
-                        <div class="bgimg"></div>`;
+                        <div id="image-div" class="bgimg"></div>`;
                         break;
                     }
 
@@ -491,7 +510,7 @@ module.exports = function (RED) {
                           }
                         </style>
 
-                        <div class="bgimg"></div>`;
+                        <div id="image-div" class="bgimg"></div>`;
                         break;
                     }
 
@@ -508,7 +527,7 @@ module.exports = function (RED) {
                           }
                         </style>
 
-                        <div class="bgimg"></div>`;
+                        <div id="image-div" class="bgimg"></div>`;
                         break;
                     }
 
@@ -525,12 +544,12 @@ module.exports = function (RED) {
                           }
                         </style>
 
-                        <div class="bgimg"></div>`;
+                        <div id="image-div" class="bgimg"></div>`;
                         node.warn("Invalid Layout - " + layout);
                         break;
                     }
                 }
-                return HTML;
+                return clickScript.concat(HTML);
             }
 
             /**
@@ -551,60 +570,29 @@ module.exports = function (RED) {
 
                 var HTML = String.raw`
                 <script>
-                  // There might be a way to solve this with pure CSS
-                  /* sometimes the parent width fits the video perfectly but
-                     the height is not enough. When that happens, we'll change
-                     width to 'auto' and height to 'parents width' */
-
-                  width = $("#video").parent().width();
-                  height = $("#video").parent().height();
-                  var parentAspect = width / height;
-
-                  var vid = document.getElementById("video");
-
-                  /**
-      	           * Some browsers execute functions before a media object is really
-                   * ready (with all it's data available), so we use this function
-                   * only when the readyState indicate that all the necessary info
-                   * is really loaded
-                	 * @param {object} video - the video loaded
-                	 */
-                  function ratio(video){
-                    var videoAspect = video.offsetWidth / video.offsetHeight;
-                    console.log(width, height);
-                    console.log(video.offsetWidth, video.offsetHeight);
-                    console.log(parentAspect, videoAspect);
-                    if (width >= video.offsetWidth) {
-                      console.log()
-                      video.style.width = "auto";
-                      video.style.height = "98%";
-
-                    } else if (height >= video.offsetHeight) {
-                      video.style.width = "98%";
-                      video.style.height = "auto";
-                    } else {
-                      video.style.width = "98%";
-                      video.style.height = "98%";
-                    }
-                  }
-                  // When all the needed information is loaded, scale the video
-                  vid.oncanplay = function(){
-                    ratio(vid);
-                  }
                   // To play/pause the video we must watch for the right msgs
                   scope.$watch('msg', function(newMsg, oldMsg, scope){
                     var media = document.getElementById("video");
-                    if (newMsg.pause !== undefined) {
-                      media.pause();
-                    } else if (newMsg.play !== undefined) {
+                    if (newMsg.play) {
                       media.play();
+                    } else {
+                      media.pause();
                     }
                   });
                 </script>
-                <div align="center" id="video-div" style="height: 100%;">
-                  <video id="video"src="${path}" ${controls_string}
-                  ${loop_string} ${onstart_string}></video>
-                </div>`;
+                <style>
+                  video{
+                    width: 100%;
+                    height: auto;
+                    max-height: 98%;
+                    position: relative;
+                    top: 50%;
+                    transform: translateY(-50%);
+                  }
+                </style>
+                <video id="video"src="${path}" ${controls_string}
+                ${loop_string} ${onstart_string}></video>
+                 `;
 
                 return HTML;
             }

@@ -226,11 +226,9 @@
             }
 
             function removeCategory() {
-
-                let category = input_category.val();
-
+                var category = document.getElementById("node-input-category");
                 if(!category) return;
-
+                category = category.options[category.selectedIndex].value;
                 $.ajax({
                     url: "uimedia/" + category,
                     type: 'DELETE',
@@ -314,9 +312,14 @@
             function removeMedia() {
 
                 let category = input_category.val();
-                var file = input_file.val();
-
+                /* to-do: investigate why 'input_file.val()' Returns
+                 * the file current being shown on the dashboard instead
+                 * of the node currently being selected
+                 */
+                var file = document.getElementById("node-input-file");
                 if(!file) return updateMediaList();
+
+                file = file.options[file.selectedIndex].value;
 
                 $.ajax({
                     url: 'uimedia/' + category + '/' + file,
@@ -493,14 +496,6 @@
       </div>
 
       <div id="media-endpoint-tab-config" style="display:none">
-        <!-- Name -->
-        <div class="form-row">
-            <label for="node-input-name">
-                <i class="fa fa-tag"></i> <span data-i18n="ui_media.config.label.name"></span></label>
-            <input type="text" id="node-input-name" data-i18n="[placeholder]ui_media.config.label.name" placeholder="Name">
-        </div>
-        <!-- Name -->
-
         <!-- Group -->
         <div class="form-row" id="template-row-group">
             <label for="node-input-group">
@@ -553,6 +548,14 @@
           </div>
         </div>
         <!-- Video Opions --->
+
+        <!-- Name -->
+        <div class="form-row">
+            <label for="node-input-name">
+                <i class="fa fa-tag"></i> <span data-i18n="ui_media.config.label.name"></span></label>
+            <input type="text" id="node-input-name" data-i18n="[placeholder]ui_media.config.label.name" placeholder="Name">
+        </div>
+        <!-- Name -->
       </div>
 
       <!-- File Tab -->
@@ -759,7 +762,8 @@
     <h3>Outputs</h3>
     <dl class="message-properties">
        <dt>payload<span class="property-type">object</span></dt>
-       <dd>When an image is clicked, the corresponding window XY value is sent to the output
+       <dd>When an image is clicked, all values relate to the clicked position
+         are sent as the outpu payload
        </dd>
     </dl>
 

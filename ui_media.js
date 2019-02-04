@@ -281,6 +281,7 @@ module.exports = function (RED) {
 
         var file = path.join(pathDir, category, id);
 
+
         fs.unlink(file, (err) => {
 
             if (err) {
@@ -450,12 +451,20 @@ module.exports = function (RED) {
                       var current_scope = scope;
 
                       function getImageXY (event) {
-                        var coordinates = {
-                          x: event.clientX,
-                          y: event.clientY
+                        var properties = {
+                          clientX: event.clientX,
+                          clientY: event.clientY,
+                          screenX: event.screenX,
+                          screenY: event.screenY,
+                          layoutX: event.layoutX,
+                          layoutY: event.layoutY,
+                          pageX: event.pageX,
+                          pageY: event.pageY,
+                          offsetX: event.offsetX,
+                          offsetY: event.offsetY
                         };
                         var msg = {
-                          payload : coordinates
+                          payload : properties
                         };
                           current_scope.send(msg);
                       }
@@ -542,17 +551,14 @@ module.exports = function (RED) {
                 if (onstart) {onstart_string = " autoplay"};
                 if (loop) {loop_string = " loop=\"true\""};
 
-
                 // create a div name based on the path
-                var div_name = path.split(".")[0];
-                div_name.concat("-div");
-                console.log(`<video id="${div_name}" src="${path}" ${controls_string}
-                ${loop_string} ${onstart_string}></video>`)
+                var video_name = path.split(".")[0];
+                video_name.concat("-video");
                 var HTML = String.raw`
                 <script>
                   // To play/pause the video we must watch for the right msgs
                   scope.$watch('msg', function(newMsg, oldMsg, scope){
-                    var media = document.getElementById("${div_name}");
+                    var media = document.getElementById("${video_name}");
                     if (newMsg.play) {
                       media.play();
                     } else {
@@ -570,8 +576,8 @@ module.exports = function (RED) {
                     transform: translateY(-50%);
                   }
                 </style>
-                <video id="${div_name}" src="${path}" ${controls_string}
-                ${loop_string} ${onstart_string}></video>
+                <video id="${video_name}" src="${path}" ${controls_string}
+                ${loop_string} ${onstart_string} ></video>
                  `;
 
                 return HTML;
@@ -614,6 +620,7 @@ module.exports = function (RED) {
                 templateScope: "local",
                 group: config.group,
                 emitOnlyNewValues: false,
+                forwardInputMessages: false,
                 // define the functions of the widget
                 convertBack: function (value) {
                     return value;
@@ -645,7 +652,10 @@ module.exports = function (RED) {
                 },
                 beforeSend: function (msg, orig) {
                     if (orig) {
-                        return orig.msg;
+                        // if the payload contains the desired hasOwnProperty
+                        if ('clientX' in orig.msg.payload){
+                          return orig.msg;
+                        }
                     }
                 },
                 initController: function ($scope, events) {

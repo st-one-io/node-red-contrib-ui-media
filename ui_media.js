@@ -440,7 +440,11 @@ module.exports = function (RED) {
           	 */
             function processImageLayout(layout, path) {
                 var HTML = undefined;
-                console.log(node.id);
+
+                // create a div name based on the path
+                var div_name = path.split(".")[0];
+                div_name.concat("-div");
+
                 var clickScript = String.raw `
                 <script>
                       var current_scope = scope;
@@ -455,9 +459,8 @@ module.exports = function (RED) {
                         };
                           current_scope.send(msg);
                       }
-                      var imageDiv = document.getElementById("image-div");
+                      var imageDiv = document.getElementById("${div_name}");
                       imageDiv.onclick = getImageXY;
-
                 </script>
                 `;
 
@@ -465,7 +468,7 @@ module.exports = function (RED) {
 
                     case 'adjust': {
                         HTML = String.raw`
-                        <div id="image-div" style="width:100%; height: auto;margin: 0, auto">
+                        <div id="${div_name}" style="width:100%; height: auto;margin: 0, auto">
                            <img src="${path}" align="middle" width="100%">
                         </div>`;
                         break;
@@ -473,7 +476,7 @@ module.exports = function (RED) {
 
                     case 'center': {
                         HTML = String.raw`
-                        <div id="image-div" style="
+                        <div id="${div_name}" style="
                         background-image: url('${path}');
                         background-size:'';
                         background-position: center;
@@ -485,7 +488,7 @@ module.exports = function (RED) {
 
                     case 'expand': {
                         HTML = String.raw`
-                        <div id="image-div" style="
+                        <div id="${div_name}" style="
                         background-image: url('${path}');
                         background-size:'cover';
                         background-position: center;
@@ -497,7 +500,7 @@ module.exports = function (RED) {
 
                     case 'side': {
                         HTML = String.raw`
-                        <div id="image-div" style="
+                        <div id="${div_name}" style="
                         background-image: url('${path}');
                         background-size:'';
                         background-position: '';
@@ -509,7 +512,7 @@ module.exports = function (RED) {
 
                     default: {
                         HTML = String.raw`
-                        <div id="image-div" style="
+                        <div id="${div_name}" style="
                         background-image: url('${path}');
                         background-size:'';
                         background-position: center;
@@ -520,7 +523,7 @@ module.exports = function (RED) {
                         break;
                     }
                 }
-                return clickScript.concat(HTML);
+                return HTML.concat(clickScript);
             }
 
             /**

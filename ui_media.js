@@ -465,86 +465,57 @@ module.exports = function (RED) {
 
                     case 'adjust': {
                         HTML = String.raw`
-                        <style type="text/css">
-                          .bgimg {
-                            background-image: url('${path}');
-                            background-size: contain;
-                            background-position: center;
-                            background-repeat: no-repeat;
-                            width: 100%;
-                            height: 100%;
-                          }
-                        </style>
-
-                        <div id="image-div" class="bgimg"></div>`;
+                        <div id="image-div" style="width:100%; height: auto;margin: 0, auto">
+                           <img src="${path}" align="middle" width="100%">
+                        </div>`;
                         break;
                     }
 
                     case 'center': {
                         HTML = String.raw`
-                        <style type="text/css">
-                          .bgimg {
-                            background-image: url('${path}');
-                            background-size: '';
-                            background-position: center;
-                            background-repeat: no-repeat;
-                            width: 100%;
-                            height: 100%;
-                          }
-                        </style>
-
-                        <div id="image-div" class="bgimg"></div>`;
+                        <div id="image-div" style="
+                        background-image: url('${path}');
+                        background-size:'';
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        width: 100%;
+                        height: 100%"></div>`;
                         break;
                     }
 
                     case 'expand': {
                         HTML = String.raw`
-                        <style type="text/css">
-                          .bgimg {
-                            background-image: url('${path}');
-                            background-size: cover;
-                            background-position: center;
-                            background-repeat: no-repeat;
-                            width: 100%;
-                            height: 100%;
-                          }
-                        </style>
-
-                        <div id="image-div" class="bgimg"></div>`;
+                        <div id="image-div" style="
+                        background-image: url('${path}');
+                        background-size:'cover';
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        width: 100%;
+                        height: 100%"></div>`;
                         break;
                     }
 
                     case 'side': {
                         HTML = String.raw`
-                        <style type="text/css">
-                          .bgimg {
-                            background-image: url('${path}');
-                            background-size: '';
-                            background-position: '';
-                            background-repeat: repeat;
-                            width: 100%;
-                            height: 100%;
-                          }
-                        </style>
-
-                        <div id="image-div" class="bgimg"></div>`;
+                        <div id="image-div" style="
+                        background-image: url('${path}');
+                        background-size:'';
+                        background-position: '';
+                        background-repeat: nrepeat;
+                        width: 100%;
+                        height: 100%"></div>`;
                         break;
                     }
 
                     default: {
                         HTML = String.raw`
-                        <style type="text/css">
-                          .bgimg {
-                            background-image: url('${path}');
-                            background-size: contain;
-                            background-position: center;
-                            background-repeat: no-repeat;
-                            width: 100%;
-                            height: 100%;
-                          }
-                        </style>
-
-                        <div id="image-div" class="bgimg"></div>`;
+                        <div id="image-div" style="
+                        background-image: url('${path}');
+                        background-size:'';
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        width: 100%;
+                        height: 100%"></div>`;
                         node.warn("Invalid Layout - " + layout);
                         break;
                     }

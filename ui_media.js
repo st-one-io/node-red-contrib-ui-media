@@ -449,7 +449,7 @@ module.exports = function (RED) {
                 <script>
                       var current_scope = scope;
 
-                      function getImageXY (event, scope) {
+                      function getImageXY (event) {
                         var coordinates = {
                           x: event.clientX,
                           y: event.clientY
@@ -538,15 +538,21 @@ module.exports = function (RED) {
                 var onstart_string = "";
                 var loop_string = "";
 
-                if (controls) {controls_string = "controls"};
-                if (onstart) {onstart_string = "autoplay"};
-                if (loop) {loop_string = "loop=\"true\""};
+                if (controls) {controls_string = " controls"};
+                if (onstart) {onstart_string = " autoplay"};
+                if (loop) {loop_string = " loop=\"true\""};
 
+
+                // create a div name based on the path
+                var div_name = path.split(".")[0];
+                div_name.concat("-div");
+                console.log(`<video id="${div_name}" src="${path}" ${controls_string}
+                ${loop_string} ${onstart_string}></video>`)
                 var HTML = String.raw`
                 <script>
                   // To play/pause the video we must watch for the right msgs
                   scope.$watch('msg', function(newMsg, oldMsg, scope){
-                    var media = document.getElementById("video");
+                    var media = document.getElementById("${div_name}");
                     if (newMsg.play) {
                       media.play();
                     } else {
@@ -564,7 +570,7 @@ module.exports = function (RED) {
                     transform: translateY(-50%);
                   }
                 </style>
-                <video id="video"src="${path}" ${controls_string}
+                <video id="${div_name}" src="${path}" ${controls_string}
                 ${loop_string} ${onstart_string}></video>
                  `;
 

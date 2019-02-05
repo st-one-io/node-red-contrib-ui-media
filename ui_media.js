@@ -4,7 +4,7 @@ var formidable = require('formidable');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
-var gambiarra;
+var mime = require('mime-types');
 
 module.exports = function (RED) {
     /* Checks if projects are enabled in the settings and create a path ot it if
@@ -382,6 +382,7 @@ module.exports = function (RED) {
 
     // check required configuration
     function checkConfig(node,conf) {
+        console.log(conf);
         if (!conf || !conf.hasOwnProperty("group")) {
             node.error(RED._("ui_list.error.no-group"));
             return false;
@@ -403,7 +404,7 @@ module.exports = function (RED) {
             var tab, elmStyle;
             var link = null,
             layout = 'adjust';
-            gambiarra = node;
+
             var group = RED.nodes.getNode(config.group);
 
             if (!group) {
@@ -414,8 +415,10 @@ module.exports = function (RED) {
             if (!tab) {
                 return;
             }
+
             if (!config.width) {
                 config.width = group.config.width;
+
             }
 
             elmStyle = {
@@ -436,15 +439,20 @@ module.exports = function (RED) {
 
             /**
 	           * Check for that we have a config instance and that our config instance has a group selected, otherwise report an error
-             * @param {string} layout - the layout to be set
+             * @param {string} config - configs with the layout to be set
           	 * @param {string} path - the layout configuration fo the media to be shown
           	 */
-            function processImageLayout(layout, path) {
+            function processImageLayout(config, path) {
                 var HTML = undefined;
-
+                var auto = false;
                 // create a div name based on the path
                 var div_name = path.split(".")[0];
                 div_name.concat("-div");
+
+                /* to-do: this is a workaround, try to fix it with css only */
+                if ((config.width == '0') && (config.height == '0')) {
+                  auto = true;
+                }
 
                 var clickScript = String.raw `
                 <script>
@@ -470,14 +478,21 @@ module.exports = function (RED) {
                       }
                       var imageDiv = document.getElementById("${div_name}");
                       imageDiv.onclick = getImageXY;
+
+                      // workaround mentioned earlier
+                      // size is set to auto, width == height
+                      if (${auto}) {
+                        var parent = document.getElementById("${div_name}").parentElement;
+                        parent.style.height = parent.style.width;
+                      }
                 </script>
                 `;
 
-                switch (layout) {
+                switch (config.layout) {
 
                     case 'adjust': {
                         HTML = String.raw`
-                        <div id="${div_name}" style="width:100%; height: auto;margin: 0, auto">
+                        <div id="${div_name}" style="width:100%; height: auto;max-height: 100%;margin: 0, auto">
                            <img src="${path}" align="middle" width="100%">
                         </div>`;
                         break;
@@ -521,13 +536,9 @@ module.exports = function (RED) {
 
                     default: {
                         HTML = String.raw`
-                        <div id="${div_name}" style="
-                        background-image: url('${path}');
-                        background-size:'';
-                        background-position: center;
-                        background-repeat: no-repeat;
-                        width: 100%;
-                        height: 100%"></div>`;
+                        <div id="${div_name}" style="width:100%; height: auto;max-height: 100%;margin: 0, auto">
+                           <img src="${path}" align="middle" width="100%">
+                        </div>`;
                         node.warn("Invalid Layout - " + layout);
                         break;
                     }
@@ -589,7 +600,13 @@ module.exports = function (RED) {
           	 * @returns {string} 'img' if the file has a image type and 'video' if the file has a video type
           	 */
              function getFileType (url) {
-               return path.extname(String(url));
+               var type = String(mime.lookup(url));
+
+               if (type.includes("image")){
+                 return "image";
+               }else if (type.includes("video")) {
+                 return "video";
+               }
              }
 
              /**
@@ -599,12 +616,12 @@ module.exports = function (RED) {
              * @param {string} layout - The image layout to be set
              * @returns {string} Widget's HTML snippet
            	 */
-             function HTML (path, extension, config) {
+             function HTML (path, type, config) {
                var raw;
 
-               if ((/\.(gif|jpg|jpeg|tiff|png)$/i).test(extension)) {
-                    raw = processImageLayout(config.layout, path);
-               } else if ((/\.(mp4|webm|ogv)$/i).test(extension)) {
+               if ((/(image)$/i).test(type)) {
+                    raw = processImageLayout(config, path);
+               } else if ((/(video)$/i).test(type)) {
                     raw =  processVideoLayout(path, config.showcontrols, config.onstart, config.loop);
                }
                return raw;

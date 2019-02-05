@@ -176,7 +176,7 @@ module.exports = function (RED) {
             }
             res.end();
         }
-
+        //console.log("path: ", pathDir);
         fs.readdir(pathDir, 'utf-8', (err, files) => {
 
             if (err) {
@@ -188,7 +188,7 @@ module.exports = function (RED) {
             var listCategory = [];
 
             var numFiles = files.length;
-
+            //console.log("num files: ", numFiles);
             if (!numFiles) {
                 doResponse(200, response);
                 return;
@@ -446,12 +446,13 @@ module.exports = function (RED) {
                 var HTML = undefined;
                 var auto = false;
                 // create a div name based on the path
-                var div_name = path.split(".")[0];
+                var d = new Date();
+                var div_name = String(d.getTime());
                 div_name.concat("-div");
 
                 /* to-do: this is a workaround, try to fix it with css only */
                 if ((config.width == '0') && (config.height == '0')) {
-                  auto = true;
+                    auto = true;
                 }
 
                 var clickScript = String.raw `
@@ -482,6 +483,7 @@ module.exports = function (RED) {
                       // workaround mentioned earlier
                       // size is set to auto, width == height
                       if (${auto}) {
+                        console.log("Inside");
                         var parent = document.getElementById("${div_name}").parentElement;
                         parent.style.height = parent.style.width;
                       }
@@ -492,8 +494,13 @@ module.exports = function (RED) {
 
                     case 'adjust': {
                         HTML = String.raw`
-                        <div id="${div_name}" style="width:100%; height: auto;max-height: 100%;margin: 0, auto">
-                           <img src="${path}" align="middle" width="100%">
+                        <div id="${div_name}" style="width:100%; height: 100%;max-height: 100%;margin: 0, auto;">
+                           <img src="${path}" align="middle" style="width: auto;
+                           height:auto;
+                           max-height: 100%;
+                           max-width: 100%;
+                           position: relative;
+                           display:block">
                         </div>`;
                         break;
                     }

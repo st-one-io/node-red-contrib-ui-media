@@ -416,9 +416,9 @@ module.exports = function (RED) {
                 return;
             }
 
-            if (!config.width) {
+            if (config.width == '0') {
                 config.width = group.config.width;
-
+                config.height = group.config.width;
             }
 
             elmStyle = {
@@ -479,14 +479,6 @@ module.exports = function (RED) {
                       }
                       var imageDiv = document.getElementById("${div_name}");
                       imageDiv.onclick = getImageXY;
-
-                      // workaround mentioned earlier
-                      // size is set to auto, width == height
-                      if (${auto}) {
-                        console.log("Inside");
-                        var parent = document.getElementById("${div_name}").parentElement;
-                        parent.style.height = parent.style.width;
-                      }
                 </script>
                 `;
 
@@ -494,12 +486,11 @@ module.exports = function (RED) {
 
                     case 'adjust': {
                         HTML = String.raw`
-                        <div id="${div_name}" style="width:100%; height: 100%;max-height: 100%;margin: 0, auto;">
+                        <div id="${div_name}" style="width:100%; height: 100%;max-height: 100%;display: inline-block;margin: 0, auto;">
                            <img src="${path}" align="middle" style="width: auto;
                            height:auto;
                            max-height: 100%;
                            max-width: 100%;
-                           position: relative;
                            display:block">
                         </div>`;
                         break;
@@ -509,11 +500,20 @@ module.exports = function (RED) {
                         HTML = String.raw`
                         <div id="${div_name}" style="
                         background-image: url('${path}');
-                        background-size:'';
+                        background-size: 200%;
                         background-position: center;
                         background-repeat: no-repeat;
                         width: 100%;
-                        height: 100%"></div>`;
+                        height: 100%;
+                        "></div>`;
+                        /*HTML = String.raw`
+                        <div id="${div_name}" style="overflow:hidden;width:100%; height: 100%;max-height: 100%;display: inline-block;margin: 0, auto;">
+                            <img src="${path}" style="
+                            position: relative;
+                            top: 50%;
+                            transform: translateY(-50%);
+                            ">
+                        </div>`;*/
                         break;
                     }
 
@@ -521,7 +521,7 @@ module.exports = function (RED) {
                         HTML = String.raw`
                         <div id="${div_name}" style="
                         background-image: url('${path}');
-                        background-size:'cover';
+                        background-size: cover;
                         background-position: center;
                         background-repeat: no-repeat;
                         width: 100%;
@@ -535,7 +535,7 @@ module.exports = function (RED) {
                         background-image: url('${path}');
                         background-size:'';
                         background-position: '';
-                        background-repeat: nrepeat;
+                        background-repeat: repeat;
                         width: 100%;
                         height: 100%"></div>`;
                         break;
@@ -668,6 +668,7 @@ module.exports = function (RED) {
                             config.showcontrols = JSON.parse(msg.payload.controls);
                         }
                     }
+
                     rawHTML = HTML(link, getFileType(link), config);
                     return {
                         format: rawHTML,

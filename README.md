@@ -2,14 +2,17 @@ node-red-contrib-ui-media
 =====================
 A Node-RED UI node to show media files (image and video) on the dashboard.
 
+This node was created by [Smart-Tech](https://netsmarttech.com) as part of the [ST-One](https://netsmarttech.com/page/st-one) project.
+
 Install
 -----------
 
-You can install this node directly from the "Manage Palette" menu in the Node-RED interface. There are no external dependencies or compilation steps.
+You can install this node directly from the "Manage Palette" menu in the Node-RED interface. For now, the required modules are on this repository, but we'll be listed here
+in the future.
 
 Alternatively, run the following command in your Node-RED user directory - typically `~/.node-red` on Linux or `%HOMEPATH%\.nodered` on Windows
 
-        npm install node-red-contrib-ui-media
+        npm install netsmarttech/node-red-contrib-ui-media
 
 Usage
 -----------

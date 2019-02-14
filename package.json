@@ -13,6 +13,10 @@
       "ui_media": "ui_media.js"
     }
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/netsmarttech/node-red-contrib-ui-media.git"
+  },
   "dependencies": {
     "formidable": "^1.2.1",
     "mime-types": "^2.1.21",

@@ -16,8 +16,6 @@
   "dependencies": {
     "formidable": "^1.2.1",
     "mime-types": "^2.1.21",
-    "mkdirp": "git://github.com/substack/node-mkdirp.git",
-    "node-red-contrib-ui-led": "^0.1.3",
-    "request": "^2.88.0"
+    "mkdirp": "^0.5.1"
   }
 }

@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Igor Steuck Lopes, Diego Rampim",
-  "license": "ISC",
+  "license": "Apache-2.0",
   "node-red": {
     "nodes": {
       "ui_media": "ui_media.js"

@@ -8,6 +8,7 @@
   },
   "author": "Igor Steuck Lopes, Diego Rampim",
   "license": "ISC",
+  "keywords:": [ "node-red" ],
   "node-red": {
     "nodes": {
       "ui_media": "ui_media.js"

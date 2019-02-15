@@ -6,7 +6,8 @@
             "group": "Group",
             "size": "Size",
             "link": "Link",
-            "configuration": "Configuration"
+            "configuration": "Configuration",
+            "alttext": "Alt"
           },
           "layouts":{
             "layout": "Layout",

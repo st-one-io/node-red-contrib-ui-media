@@ -12,7 +12,7 @@ in the future.
 
 Alternatively, run the following command in your Node-RED user directory - typically `~/.node-red` on Linux or `%HOMEPATH%\.nodered` on Windows
 
-        npm install netsmarttech/node-red-contrib-ui-media
+        npm install node-red-contrib-ui-media
 
 Usage
 -----------
@@ -41,4 +41,4 @@ Please open an issue on the [page of the project on GitHub](https://github.com/n
 
 License
 -----------
-Copyright 2016-2017 Smart-Tech, [Apache 2.0 license](LICENSE).
+Copyright 2019 Smart-Tech, [Apache 2.0 license](LICENSE).

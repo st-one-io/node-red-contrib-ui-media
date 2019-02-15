@@ -37,7 +37,7 @@ In general, categories and files will be saved at `<path to your node-red folder
 Bugs and enhancements
 -----------
 
-Please open an issue on the [page of the project on GitHub](https://github.com/netsmarttech/node-red-contrib-s7). There's also a [Node-RED mail group](https://groups.google.com/forum/#!forum/node-red) on GoogleGroups
+Please share your ideas and experiences on the [Node-RED forum](https://discourse.nodered.org/), or open an issue on the [page of the project on GitHub](https://github.com/netsmarttech/node-red-contrib-ui-media)
 
 License
 -----------

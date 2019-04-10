@@ -33,7 +33,11 @@ module.exports = function (RED) {
       		// create the paths
       		var pathDir = path.join(RED.settings.userDir, "projects",String(currentProject), "ui-media", "lib");
       		var pathUpload = path.join(RED.settings.userDir, "projects",String(currentProject), "ui-media", "upload");
-    	}
+    	}else{
+		// create paths without the projects directory
+      		var pathDir = path.join(RED.settings.userDir, "lib", "ui-media", "lib");
+      		var pathUpload = path.join(RED.settings.userDir, "lib", "ui-media", "upload");
+	}
     } else {
       // create paths without the projects directory
       var pathDir = path.join(RED.settings.userDir, "lib", "ui-media", "lib");

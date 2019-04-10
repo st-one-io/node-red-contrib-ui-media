@@ -26,12 +26,14 @@ module.exports = function (RED) {
     /* Checks if projects are enabled in the settings and create a path ot it if
      * it is. In case projects are disabled, the old path to the lib is created
       */
-    if ((RED.settings.get("editorTheme")).projects.enabled) {
-      // get the current active project rename
-      var currentProject = RED.settings.get("projects").activeProject;
-      // create the paths
-      var pathDir = path.join(RED.settings.userDir, "projects",String(currentProject), "ui-media", "lib");
-      var pathUpload = path.join(RED.settings.userDir, "projects",String(currentProject), "ui-media", "upload");
+    if(!(RED.settings.get("editorTheme") == null) && !(RED.settings.get("projects") == null)){
+    	if ((RED.settings.get("editorTheme")).projects.enabled) {
+      		// get the current active project name
+      		var currentProject = RED.settings.get("projects").activeProject;
+      		// create the paths
+      		var pathDir = path.join(RED.settings.userDir, "projects",String(currentProject), "ui-media", "lib");
+      		var pathUpload = path.join(RED.settings.userDir, "projects",String(currentProject), "ui-media", "upload");
+    	}
     } else {
       // create paths without the projects directory
       var pathDir = path.join(RED.settings.userDir, "lib", "ui-media", "lib");
@@ -86,7 +88,7 @@ module.exports = function (RED) {
 
                     name = files[i].name;
 
-                    if (!(/\.(gif|jpg|jpeg|tiff|png|mp4|webm|ogv)$/i).test(name)) {
+                    if (!(/\.(gif|jpg|jpeg|tiff|png|svg|mp4|webm|ogv)$/i).test(name)) {
 
                         error.push({
                             cod: 400,
@@ -278,8 +280,7 @@ module.exports = function (RED) {
                 return;
             }
 
-            res.setHeader('Content-Type', 'media/*');
-            fs.createReadStream(pathImage).pipe(res);
+	    res.sendFile(pathImage);
         });
 
     }); //--> GET /uimedia/'category'/'id'
@@ -502,7 +503,7 @@ module.exports = function (RED) {
 
                     case 'adjust': {
                         HTML = String.raw`
-                        <div id="${div_name}" style="width:100%; height: 100%;max-height: 100%;display: inline-block;margin: 0, auto;">
+                        <div id="${div_name}" style="width:100%; height: 100%;max-height: 100%;display: inline-block;margin: 0 auto;" title="${config.tooltip}">
                            <img src="${path}" align="middle" style="width: auto;
                            height:auto;
                            max-height: 100%;
@@ -516,12 +517,14 @@ module.exports = function (RED) {
                         HTML = String.raw`
                         <div id="${div_name}" style="
                         background-image: url('${path}');
-                        background-size: 200%;
+                        background-size: 100%;
                         background-position: center;
                         background-repeat: no-repeat;
                         width: 100%;
                         height: 100%;
-                        "></div>`;
+                        "
+			title="${config.tooltip}"
+			></div>`;
                         /*HTML = String.raw`
                         <div id="${div_name}" style="overflow:hidden;width:100%; height: 100%;max-height: 100%;display: inline-block;margin: 0, auto;">
                             <img src="${path}" style="
@@ -541,7 +544,9 @@ module.exports = function (RED) {
                         background-position: center;
                         background-repeat: no-repeat;
                         width: 100%;
-                        height: 100%"></div>`;
+                        height: 100%"
+			title="${config.tooltip}"
+			></div>`;
                         break;
                     }
 
@@ -553,13 +558,16 @@ module.exports = function (RED) {
                         background-position: '';
                         background-repeat: repeat;
                         width: 100%;
-                        height: 100%"></div>`;
+                        height: 100%"
+		        title="${config.tooltip}"
+			></div>`;
                         break;
                     }
 
                     default: {
                         HTML = String.raw`
-                        <div id="${div_name}" style="width:100%; height: auto;max-height: 100%;margin: 0, auto">
+                        <div id="${div_name}" style="width:100%; height: auto;max-height: 100%;margin: 0, auto"title="${config.tooltip}">
+
                            <img src="${path}" align="middle" width="100%">
                         </div>`;
                         node.warn("Invalid Layout - " + layout);
@@ -587,8 +595,10 @@ module.exports = function (RED) {
 
                 // create a div name based on the path
                 var video_name = path.split(".")[0];
-                video_name.concat("-video");
-                var HTML = String.raw`
+		video_name = video_name.replace(/ /g, '');
+                video_name = video_name.concat("-video");
+		video_name = video_name.split("/")[3];
+		var HTML = String.raw`
                 <script>
                   // To play/pause the video we must watch for the right msgs
                   scope.$watch('msg', function(newMsg, oldMsg, scope){
@@ -599,19 +609,23 @@ module.exports = function (RED) {
                       media.pause();
                     }
                   });
+
+		  // Now we add the current style to the header section
+		  var head = document.head;
+		  var style = document.createElement('style');
+		  var css = "#${video_name} { width: 100%; height: auto; max-height: 98%;position: relative; top: 50%; transform: translateY(-50%);}"
+		
+		  head.appendChild(style);
+		  style.type = 'text/css';
+		  if (style.styleSheet){
+			  style.styleSheet.cssText = css;
+		  }else {
+			  style.appendChild(document.createTextNode(css));
+		  }
                 </script>
-                <style>
-                  video{
-                    width: 100%;
-                    height: auto;
-                    max-height: 98%;
-                    position: relative;
-                    top: 50%;
-                    transform: translateY(-50%);
-                  }
-                </style>
-                <video id="${video_name}" src="${path}" ${controls_string}
-                ${loop_string} ${onstart_string} ></video>
+
+                <video id="${video_name}"src="${path}" ${controls_string}
+                ${loop_string} ${onstart_string}></video>
                  `;
 
                 return HTML;

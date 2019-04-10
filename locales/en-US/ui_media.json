@@ -29,7 +29,8 @@
             "preview": "Preview",
             "add-new": "Add new...",
             "remove-category": "Remove category...",
-            "remove-media": "Remove media..."
+            "remove-media": "Remove media...",
+	    "tooltip": "Tooltip"
          }
        }
     }

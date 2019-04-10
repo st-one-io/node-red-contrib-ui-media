@@ -44,7 +44,8 @@
             showcontrols: {value: true},
             loop: {value: true},
             onstart: {value: false},
-            scope: {value: 'local'}
+            scope: {value: 'local'},
+  	    tooltip: {value: ''}
         },
         inputs: 1,
         outputs: 1,
@@ -290,7 +291,7 @@
                     data.append(key, value);
                 });
 
-                var link = "/uimedia/" + category + "/" + filesToUpload[0].name;
+                var link = "uimedia/" + category + "/" + filesToUpload[0].name;
 
                 $.ajax({
                     url: link,
@@ -542,6 +543,14 @@
         </div>
         <!-- Layout -->
 
+	<!-- Tooltip -->
+        <div class="form-row">
+           <label for="node-input-tooltip">
+           <i class="fa fa-tag"></i> <span data-i18n="ui_media.files.label.tooltip"></span></label>
+           <input type="text" id="node-input-tooltip" data-i18n="[placeholder]ui_media.files.label.tooltip" placeholder="Tooltip">
+        </div>
+        <!-- Tooltip -->
+
         <!-- Video Opions --->
         <div class="form-row">
           <div class="form-row">
@@ -779,7 +788,7 @@
     <dl class="message-properties">
        <dt>payload<span class="property-type">object</span></dt>
        <dd>When an image is clicked, all values relate to the clicked position
-         are sent as the outpu payload
+         are sent as the output payload
        </dd>
     </dl>
 

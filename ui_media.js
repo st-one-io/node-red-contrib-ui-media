@@ -618,7 +618,7 @@ module.exports = function (RED) {
 		  var head = document.head;
 		  var style = document.createElement('style');
 		  var css = "#${video_name} { width: 100%; height: auto; max-height: 98%;position: relative; top: 50%; transform: translateY(-50%);}"
-		
+
 		  head.appendChild(style);
 		  style.type = 'text/css';
 		  if (style.styleSheet){
@@ -688,13 +688,17 @@ module.exports = function (RED) {
                     if (msg.layout !== undefined) {
                         layout = msg.layout;
                     }
+                    var fileType;
                     // process current media
                     if (msg.src !== undefined) {
                         link = msg.src;
                     }else if (msg.payload !== undefined) {
                         if (typeof msg.payload == 'string') {
                             link = msg.payload ? '/uimedia/' + msg.payload : '';
-                        } else if (msg.payload.category && msg.payload.name) {
+                        } else if (Buffer.isBuffer(msg.payload)){
+                            link = "data:" + msg.mimetype + ";base64," + msg.payload.toString('base64');
+                            fileType=msg.mimetype.split('/')[0];
+                        }else if (msg.payload.category && msg.payload.name) {
                             link = '/uimedia/' + msg.payload.category + '/' + msg.payload.name;
                         } else if (msg.payload.onstart || msg.payload.loop || msg.payload.controls) {
                             config.onstart = JSON.parse(msg.payload.onstart);
@@ -703,7 +707,9 @@ module.exports = function (RED) {
                         }
                     }
 
-                    rawHTML = HTML(link, getFileType(link), config);
+                    if(fileType == undefined) fileType = getFileType(link);
+
+                    rawHTML = HTML(link, fileType, config);
                     return {
                         format: rawHTML,
                         msg: msg

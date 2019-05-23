@@ -745,7 +745,7 @@
             <code>side</code> or
             <code>expand</code>.
         </dd>
-
+        <br>
         <dt> play/pause
           <span class="property-type">boolean</span>
         </dt>
@@ -760,7 +760,7 @@
             <code>true</code>,
             <code>false</code>
         </dd>
-
+        <br>
         <dt> run on start/loop/controls
           <span class="property-type">boolean</span>
         </dt>
@@ -780,6 +780,24 @@
             Example:
             <br>
             <code>msg.payload: {"runonstart": "true", "loop": "false", "controls": "true"} </code>
+        </dd>
+        <br>
+        <dt> msg.mimetype
+          <span class="property-type">string</span>
+        </dt>
+        <dd>Images can also be loaded to another file and sent as a buffer to ui-media. You must also
+          send the mimetyp. A list of all existing mimetypes can be easily found on the internet:<br>
+          <code>msg.mimetype: type/file</code>
+        </dd>
+
+        <dd>
+            Example 1 - Sending a PNG image
+            <br>
+            <code>msg.mimetype: image/png</code>
+            <br>
+            Example 2 - Sending a JPG image
+            <br>
+            <code>msg.mimetype: image/jpeg</code>
         </dd>
 
     </dl>

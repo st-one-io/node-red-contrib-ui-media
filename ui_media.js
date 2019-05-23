@@ -697,7 +697,6 @@ module.exports = function (RED) {
                             link = msg.payload ? '/uimedia/' + msg.payload : '';
                         } else if (Buffer.isBuffer(msg.payload)){
                             link = "data:" + msg.mimetype + ";base64," + msg.payload.toString('base64');
-                            fileType=msg.mimetype.split('/')[0];
                         }else if (msg.payload.category && msg.payload.name) {
                             link = '/uimedia/' + msg.payload.category + '/' + msg.payload.name;
                         } else if (msg.payload.onstart || msg.payload.loop || msg.payload.controls) {
@@ -707,7 +706,12 @@ module.exports = function (RED) {
                         }
                     }
 
-                    if(fileType == undefined) fileType = getFileType(link);
+                    if(msg.mimetype == undefined){
+                      if(fileType == undefined) fileType = getFileType(link);
+                    }else {
+                      fileType = msg.mimetype.split('/')[0];
+                      if(!fileType) node.error("Missing mimetype");
+                    }
 
                     rawHTML = HTML(link, fileType, config);
                     return {

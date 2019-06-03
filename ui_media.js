@@ -21,6 +21,7 @@ var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
 var mime = require('mime-types');
+var os = require('os');
 
 module.exports = function (RED) {
     /* Checks if projects are enabled in the settings and create a path ot it if
@@ -283,6 +284,8 @@ module.exports = function (RED) {
                 res.status(404).json(err).end();
                 return;
             }
+
+	    if ((os.platform()) === "win32") pathImage = "C:" + pathImage;
 
 	    res.sendFile(pathImage);
         });
@@ -659,7 +662,7 @@ module.exports = function (RED) {
            	 */
              function HTML (path, type, config) {
                var raw;
-
+	       
                if ((/(image)$/i).test(type)) {
                     raw = processImageLayout(config, path);
                } else if ((/(video)$/i).test(type)) {

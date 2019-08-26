@@ -1,3 +1,4 @@
+//@ts-check
 /*
    Copyright 2019 Smart-Tech Controle e Automação
 
@@ -24,25 +25,26 @@ var mime = require('mime-types');
 var os = require('os');
 
 module.exports = function (RED) {
-    /* Checks if projects are enabled in the settings and create a path ot it if
+    /**
+     * Checks if projects are enabled in the settings and create a path for it if 
      * it is. In case projects are disabled, the old path to the lib is created
-      */
-    if(!(RED.settings.get("editorTheme") == null) && !(RED.settings.get("projects") == null)){
-    	if ((RED.settings.get("editorTheme")).projects.enabled) {
-      		// get the current active project name
-      		var currentProject = RED.settings.get("projects").activeProject;
-      		// create the paths
-      		var pathDir = path.join(RED.settings.userDir, "projects",String(currentProject), "ui-media", "lib");
-      		var pathUpload = path.join(RED.settings.userDir, "projects",String(currentProject), "ui-media", "upload");
-    	}else{
-		// create paths without the projects directory
-      		var pathDir = path.join(RED.settings.userDir, "lib", "ui-media", "lib");
-      		var pathUpload = path.join(RED.settings.userDir, "lib", "ui-media", "upload");
-	}
+     */
+    if (!(RED.settings.get("editorTheme") == null) && !(RED.settings.get("projects") == null)) {
+        if ((RED.settings.get("editorTheme")).projects.enabled) {
+            // get the current active project name
+            var currentProject = RED.settings.get("projects").activeProject;
+            // create the paths
+            var pathDir = path.join(RED.settings.userDir, "projects", String(currentProject), "ui-media", "lib");
+            var pathUpload = path.join(RED.settings.userDir, "projects", String(currentProject), "ui-media", "upload");
+        } else {
+            // create paths without the projects directory
+            var pathDir = path.join(RED.settings.userDir, "lib", "ui-media", "lib");
+            var pathUpload = path.join(RED.settings.userDir, "lib", "ui-media", "upload");
+        }
     } else {
-      // create paths without the projects directory
-      var pathDir = path.join(RED.settings.userDir, "lib", "ui-media", "lib");
-      var pathUpload = path.join(RED.settings.userDir, "lib", "ui-media", "upload");
+        // create paths without the projects directory
+        var pathDir = path.join(RED.settings.userDir, "lib", "ui-media", "lib");
+        var pathUpload = path.join(RED.settings.userDir, "lib", "ui-media", "upload");
     }
 
     mkdirp(pathDir, (err) => {
@@ -112,7 +114,7 @@ module.exports = function (RED) {
                             });
 
                             return;
-                        }https://nodered.org/docs/api/runtime/api#getNode
+                        } //https://nodered.org/docs/api/runtime/api#getNode
                         res.status(201).send(success[0]).end();
                     }
 
@@ -285,9 +287,9 @@ module.exports = function (RED) {
                 return;
             }
 
-	    if ((os.platform()) === "win32") pathImage = "C:" + pathImage;
+            if ((os.platform()) === "win32") pathImage = "C:" + pathImage;
 
-	    res.sendFile(pathImage);
+            res.sendFile(pathImage);
         });
 
     }); //--> GET /uimedia/'category'/'id'
@@ -405,7 +407,7 @@ module.exports = function (RED) {
     ///------> API
 
     // check required configuration
-    function checkConfig(node,conf) {
+    function checkConfig(node, conf) {
         console.log(conf);
         if (!conf || !conf.hasOwnProperty("group")) {
             node.error(RED._("ui_list.error.no-group"));
@@ -420,14 +422,14 @@ module.exports = function (RED) {
     function ImageNode(config) {
         try {
             // load the necessary module
-            if(ui === undefined) {
+            if (ui === undefined) {
                 ui = RED.require("node-red-dashboard")(RED);
             }
             RED.nodes.createNode(this, config);
             var node = this;
             var tab, elmStyle;
             var link = null,
-            layout = 'adjust';
+                layout = 'adjust';
 
             var group = RED.nodes.getNode(config.group);
 
@@ -479,7 +481,7 @@ module.exports = function (RED) {
                     auto = true;
                 }
 
-                var clickScript = String.raw `
+                var clickScript = String.raw`
                 <script>
                       var current_scope = scope;
 
@@ -596,16 +598,16 @@ module.exports = function (RED) {
                 var onstart_string = "";
                 var loop_string = "";
 
-                if (controls) {controls_string = " controls"};
-                if (onstart) {onstart_string = " autoplay"};
-                if (loop) {loop_string = " loop=\"true\""};
+                if (controls) { controls_string = " controls" };
+                if (onstart) { onstart_string = " autoplay" };
+                if (loop) { loop_string = " loop=\"true\"" };
 
                 // create a div name based on the path
                 var video_name = path.split(".")[0];
-		video_name = video_name.replace(/ /g, '');
+                video_name = video_name.replace(/ /g, '');
                 video_name = video_name.concat("-video");
-		video_name = video_name.split("/")[3];
-		var HTML = String.raw`
+                video_name = video_name.split("/")[3];
+                var HTML = String.raw`
                 <script>
                   // To play/pause the video we must watch for the right msgs
                   scope.$watch('msg', function(newMsg, oldMsg, scope){
@@ -643,36 +645,36 @@ module.exports = function (RED) {
           	 * @param {object} url - The file path
           	 * @returns {string} 'img' if the file has a image type and 'video' if the file has a video type
           	 */
-             function getFileType (url) {
-               var type = String(mime.lookup(url));
+            function getFileType(url) {
+                var type = String(mime.lookup(url));
 
-               if (type.includes("image")){
-                 return "image";
-               }else if (type.includes("video")) {
-                 return "video";
-               }
-             }
+                if (type.includes("image")) {
+                    return "image";
+                } else if (type.includes("video")) {
+                    return "video";
+                }
+            }
 
-             /**
- 	           * Check for that we have a config instance and that our config instance has a group selected, otherwise report an error
-           	 * @param {object} path - The file path
-             * @param {string} extension - The file's extension
-             * @param {string} layout - The image layout to be set
-             * @returns {string} Widget's HTML snippet
-           	 */
-             function HTML (path, type, config) {
-               var raw;
-	       
-               if ((/(image)$/i).test(type)) {
+            /**
+                * Check for that we have a config instance and that our config instance has a group selected, otherwise report an error
+                  * @param {object} path - The file path
+            * @param {string} extension - The file's extension
+            * @param {string} layout - The image layout to be set
+            * @returns {string} Widget's HTML snippet
+                  */
+            function HTML(path, type, config) {
+                var raw;
+
+                if ((/(image)$/i).test(type)) {
                     raw = processImageLayout(config, path);
-               } else if ((/(video)$/i).test(type)) {
-                    raw =  processVideoLayout(path, config.showcontrols, config.onstart, config.loop);
-               }
-               return raw;
-             }
+                } else if ((/(video)$/i).test(type)) {
+                    raw = processVideoLayout(path, config.showcontrols, config.onstart, config.loop);
+                }
+                return raw;
+            }
 
-             // creates the widget
-             var done = ui.addWidget({
+            // creates the widget
+            var done = ui.addWidget({
                 // define the widger properties
                 node: node,
                 width: config.width,
@@ -686,7 +688,7 @@ module.exports = function (RED) {
                 convertBack: function (value) {
                     return value;
                 },
-                beforeEmit: function (msg, value){
+                beforeEmit: function (msg, value) {
                     // process current layout
                     if (msg.layout !== undefined) {
                         layout = msg.layout;
@@ -695,12 +697,12 @@ module.exports = function (RED) {
                     // process current media
                     if (msg.src !== undefined) {
                         link = msg.src;
-                    }else if (msg.payload !== undefined) {
+                    } else if (msg.payload !== undefined) {
                         if (typeof msg.payload == 'string') {
                             link = msg.payload ? '/uimedia/' + msg.payload : '';
-                        } else if (Buffer.isBuffer(msg.payload)){
+                        } else if (Buffer.isBuffer(msg.payload)) {
                             link = "data:" + msg.mimetype + ";base64," + msg.payload.toString('base64');
-                        }else if (msg.payload.category && msg.payload.name) {
+                        } else if (msg.payload.category && msg.payload.name) {
                             link = '/uimedia/' + msg.payload.category + '/' + msg.payload.name;
                         } else if (msg.payload.onstart || msg.payload.loop || msg.payload.controls) {
                             config.onstart = JSON.parse(msg.payload.onstart);
@@ -709,11 +711,11 @@ module.exports = function (RED) {
                         }
                     }
 
-                    if(msg.mimetype == undefined){
-                      if(fileType == undefined) fileType = getFileType(link);
-                    }else {
-                      fileType = msg.mimetype.split('/')[0];
-                      if(!fileType) node.error("Missing mimetype");
+                    if (msg.mimetype == undefined) {
+                        if (fileType == undefined) fileType = getFileType(link);
+                    } else {
+                        fileType = msg.mimetype.split('/')[0];
+                        if (!fileType) node.error("Missing mimetype");
                     }
 
                     rawHTML = HTML(link, fileType, config);
@@ -725,21 +727,21 @@ module.exports = function (RED) {
                 beforeSend: function (msg, orig) {
                     if (orig) {
                         // if the payload contains the desired hasOwnProperty
-                        if ('clientX' in orig.msg.payload){
-                          return orig.msg;
+                        if ('clientX' in orig.msg.payload) {
+                            return orig.msg;
                         }
                     }
                 },
                 initController: function ($scope, events) {
                     $scope.value = false;
                     $scope.click = function (val) {
-                        $scope.send({payload: val});
+                        $scope.send({ payload: val });
                     };
                 }
 
             });
-             node.emit('input', {}); //triggers the configured media
-             node.on("close", done);
+            node.emit('input', {}); //triggers the configured media
+            node.on("close", done);
         }
         catch (e) {
             console.log(e);
@@ -814,11 +816,11 @@ const sanitizeInput = (function (str) {
 
     //return function sanitizeInput(str) {
 
-        return (str || "")
-            .replace(illegalRe, replacement)
-            .replace(controlRe, replacement)
-            .replace(reservedRe, replacement)
-            .replace(windowsReservedRe, replacement)
-            .replace(windowsTrailingRe, replacement);
+    return (str || "")
+        .replace(illegalRe, replacement)
+        .replace(controlRe, replacement)
+        .replace(reservedRe, replacement)
+        .replace(windowsReservedRe, replacement)
+        .replace(windowsTrailingRe, replacement);
     //}
 });

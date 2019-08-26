@@ -20,13 +20,14 @@
 var formidable = require('formidable');
 var fs = require('fs');
 var path = require('path');
+var urlPath = path.posix;
 var mkdirp = require('mkdirp');
 var mime = require('mime-types');
 var os = require('os');
 
 module.exports = function (RED) {
 
-    var pathDir, pathUpload;
+    var pathDir, pathUpload, httpRoot;
 
     /**
      * Checks if projects are enabled in the settings and create a path for it if
@@ -46,6 +47,8 @@ module.exports = function (RED) {
             pathDir = path.join(userDir, "lib", "ui-media", "lib");
             pathUpload = path.join(userDir, "lib", "ui-media", "upload");
         }
+
+        httpRoot = RED.settings.get('httpAdminRoot') || RED.settings.get('httpRoot') || '/';
 
         mkdirp(pathDir, (err) => {
             if (err) {
@@ -691,11 +694,11 @@ module.exports = function (RED) {
                     link = msg.src;
                 } else if (msg.payload !== undefined) {
                     if (typeof msg.payload == 'string') {
-                        link = msg.payload ? '/uimedia/' + msg.payload : '';
+                        link = msg.payload ? urlPath.join(httpRoot, 'uimedia', msg.payload) : '';
                     } else if (Buffer.isBuffer(msg.payload)) {
                         link = "data:" + msg.mimetype + ";base64," + msg.payload.toString('base64');
                     } else if (msg.payload.category && msg.payload.name) {
-                        link = '/uimedia/' + msg.payload.category + '/' + msg.payload.name;
+                        link = urlPath.join(httpRoot, 'uimedia', msg.payload.category, msg.payload.name);
                     } else if (msg.payload.onstart || msg.payload.loop || msg.payload.controls) {
                         config.onstart = JSON.parse(msg.payload.onstart);
                         config.loop = JSON.parse(msg.payload.loop);

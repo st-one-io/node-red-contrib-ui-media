@@ -53,7 +53,6 @@ module.exports = function (RED) {
         mkdirp(pathDir, (err) => {
             if (err) {
                 RED.log.error(`Could not create library directory [${pathDir}]: ${err}`);
-                console.log(err);
             }
         });
 
@@ -69,7 +68,7 @@ module.exports = function (RED) {
 
     ///------> API
 
-    RED.httpAdmin.post('/uimedia/:category/:id', (req, res) => {
+    function uploadMedia(req, res){
 
         var error = [];
         var success = [];
@@ -166,18 +165,13 @@ module.exports = function (RED) {
                 }
             });
         });
-    }); //--> POST /uimedia/'category'/'id'
+    }
 
     /**
-     * Creates a category.Returns the list of current categories
-     * @returns 200 - JSON with all the categories
-     * @returns 500 - system error
+     * Creates a category and returns the list of current categories
      */
-    //TODO: use the :category instead of a multpart form post
-    RED.httpAdmin.post('/uimedia/:category', (req, res) => {
-        console.log(sanitizeInput(req.params.category));
+    function createCategory(req, res) {
         let dirCategory = path.join(pathDir, sanitizeInput(req.params.category));
-        console.log(dirCategory);
         mkdirp(dirCategory, (err) => {
             if (err) {
                 res.status(500).send(err);
@@ -186,30 +180,23 @@ module.exports = function (RED) {
 
             restListCategories(req, res);
         });
-    }); //--> POST /uimedia/category/
+
+    }
 
     /**
      * Returns a list of categories
-     * @returns 200 - JSON with all the categories
-     * @returns 500 - system error
      */
     function restListCategories(req, res) {
 
         let responseDone = false
 
         function doResponse(code, data) {
-            if (responseDone) {
-                return;
-            }
+            if (responseDone) return;
             responseDone = true;
 
-            res.status(code);
-            if (data) {
-                res.json(data);
-            }
-            res.end();
+            res.status(code).json(data).end();
         }
-        //console.log("path: ", pathDir);
+
         fs.readdir(pathDir, 'utf-8', (err, files) => {
 
             if (err) {
@@ -221,7 +208,7 @@ module.exports = function (RED) {
             var listCategory = [];
 
             var numFiles = files.length;
-            //console.log("num files: ", numFiles);
+
             if (!numFiles) {
                 doResponse(200, response);
                 return;
@@ -249,17 +236,12 @@ module.exports = function (RED) {
                 });
             });
         });
-    } //--> GET /uimedia
-    RED.httpAdmin.get("/uimedia", restListCategories);
+    }
 
     /**
      * Gets a JSON with the content of a category
-     * @returns 200 - JSON with all the medias inside this category
-     * @returns 404 - category not found
-     * @returns 500 - system error
      */
-    RED.httpAdmin.get("/uimedia/:category", (req, res) => {
-
+    function listCategoryContents(req, res) {
         let pathCategory = path.join(pathDir, sanitizeInput(req.params.category));
 
         listFilesDir(pathCategory, (err, files) => {
@@ -274,16 +256,12 @@ module.exports = function (RED) {
 
             res.status(200).json(files).end();
         });
-
-    }); //--> GET /uimedia/:category/medias/
+    }
 
     /**
      * Gets the specified media
-     * @returns 200 - the media
-     * @returns 404 - media not found
      */
-    RED.httpAdmin.get("/uimedia/:category/:id", (req, res) => {
-
+    function getMedia(req, res) {
         let id = sanitizeInput(req.params.id);
         let category = sanitizeInput(req.params.category);
 
@@ -299,63 +277,55 @@ module.exports = function (RED) {
 
             res.sendFile(pathImage);
         });
-
-    }); //--> GET /uimedia/'category'/'id'
+    }
 
     /**
      * Deletes an media inside a category
-     * @returns 204 - OK
-     * @returns 404 - media not found
-     * @returns 500 - system error
      */
-    RED.httpAdmin.delete("/uimedia/:category/:id", (req, res) => {
-
+    function deleteMedia(req, res){
         let id = sanitizeInput(req.params.id);
         let category = sanitizeInput(req.params.category);
 
         var file = path.join(pathDir, category, id);
 
-
         fs.unlink(file, (err) => {
-
             if (err) {
-                res.status(404).send(err).end();
                 if (err.code === 'ENOENT') {
                     res.status(404).end();
                 } else {
                     res.status(500).json(err).end();
                 }
-                return;
+            } else {
+                res.status(204).end();
             }
-
-            res.status(204).end();
-            return;
-
         });
-    }); //--> DELETE /uimedia/'category'/'id'
+    }
 
     /**
      * Deletes a category, and all medias that it may contain
-     * @returns 204 - OK
-     * @returns 404 - category not found
-     * @returns 500 - system error
+     * Status codes: 204 - OK, 404 - category not found
+     * 500 - system error
      */
-    RED.httpAdmin.delete("/uimedia/:category", (req, res) => {
-
+    function deleteCategory(req, res) {
         let categoryPath = path.join(pathDir, sanitizeInput(req.params.category));
         let responseDone = false;
 
         function doResponse(code, data) {
-            if (responseDone) {
-                return;
-            }
+            if (responseDone) return;
             responseDone = true;
 
-            res.status(code)
-            if (data) {
-                res.json(data);
-            }
-            res.end();
+            res.status(code).end(data);
+        }
+
+        function removeFolder() {
+            fs.rmdir(categoryPath, (err) => {
+                if (err) {
+                    RED.log.error("Error removing category: " + err);
+                    doResponse(500, err);
+                } else {
+                    doResponse(204);
+                }
+            });
         }
 
         fs.readdir(categoryPath, 'utf-8', (err, files) => {
@@ -372,45 +342,29 @@ module.exports = function (RED) {
             let contFiles = files.length;
 
             // remove folder if empty
-            if (contFiles === 0) {
-                fs.rmdir(categoryPath, (err) => {
-                    if (err) {
-                        console.log("Error: ", err);
-                        doResponse(500, err);
-                        return;
-                    }
+            if (contFiles === 0) return removeFolder();
 
-                    doResponse(204);
-                });
-                return;
-            }
-
-            files.forEach((file) => {
-                let filePath = path.join(categoryPath, file);
-
-                fs.unlink(filePath, (err) => {
+            files.forEach(file => {
+                fs.unlink(path.join(categoryPath, file), err => {
 
                     contFiles--;
+                    if (err) return doResponse(500, err);
 
-                    if (err) {
-                        doResponse(500, err);
-                        return;
-                    }
-
-                    if (contFiles === 0) {
-                        fs.rmdir(categoryPath, (err) => {
-                            if (err) {
-                                doResponse(500, err);
-                                return;
-                            }
-
-                            doResponse(204);
-                        });
-                    }
+                    if (contFiles === 0) removeFolder();
                 });
             });
         });
-    }); //--> DELETE /uimedia/'category'/'id'
+    }
+
+    // "public" endpoint
+    RED.httpAdmin.get('/uimedia/:category/:id', getMedia);
+    // "private" endpoints that need permissions
+    RED.httpAdmin.post('/uimedia/:category/:id', RED.auth.needsPermission('ui.ui_media'), uploadMedia);
+    RED.httpAdmin.post('/uimedia/:category', RED.auth.needsPermission('ui.ui_media'), createCategory);
+    RED.httpAdmin.get('/uimedia', RED.auth.needsPermission('ui.ui_media'), restListCategories);
+    RED.httpAdmin.get('/uimedia/:category', RED.auth.needsPermission('ui.ui_media'), listCategoryContents);
+    RED.httpAdmin.delete('/uimedia/:category/:id', RED.auth.needsPermission('ui.ui_media'), deleteMedia);
+    RED.httpAdmin.delete('/uimedia/:category', RED.auth.needsPermission('ui.ui_media'), deleteCategory);
 
     ///------> API
 

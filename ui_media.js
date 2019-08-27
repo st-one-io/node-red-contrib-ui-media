@@ -68,7 +68,7 @@ module.exports = function (RED) {
 
     ///------> API
 
-    function uploadMedia(req, res){
+    function uploadMedia(req, res) {
 
         var error = [];
         var success = [];
@@ -141,7 +141,7 @@ module.exports = function (RED) {
                             return;
                         }
 
-                        let pathExtern = path.join("/", "uimedia", category, name);
+                        let pathExtern = urlPath.join(httpRoot, 'uimedia', category, name);
                         let reference = category + "/" + name;
 
                         let obj = {
@@ -282,7 +282,7 @@ module.exports = function (RED) {
     /**
      * Deletes an media inside a category
      */
-    function deleteMedia(req, res){
+    function deleteMedia(req, res) {
         let id = sanitizeInput(req.params.id);
         let category = sanitizeInput(req.params.category);
 
@@ -406,7 +406,7 @@ module.exports = function (RED) {
         }
 
         if (config.category && config.file) {
-            link = '/uimedia/' + config.category + '/' + config.file;
+            link = urlPath.join(httpRoot, 'uimedia', config.category, config.file);
         }
 
         // create the widget's HTML snippet

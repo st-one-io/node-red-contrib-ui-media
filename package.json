@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-ui-media",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "description": "A simple NODE to allow images and videos on the dashboard",
   "main": "ui_image.js",
   "scripts": {

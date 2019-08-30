@@ -65,6 +65,16 @@ module.exports = function (RED) {
 
     // initialize directories with current project settings
     updateDirs();
+    // Subscribe to a project change
+    if (RED.events) {
+        RED.events.on('runtime-event', evt => {
+            if (evt && evt.id === 'project-update' && evt.payload.action == 'loaded') {
+                // Update directories when loading a project only
+                updateDirs();
+            }
+        })
+    }
+
 
     ///------> API
 
@@ -382,9 +392,6 @@ module.exports = function (RED) {
             ui = RED.require("node-red-dashboard")(RED);
         }
         RED.nodes.createNode(this, config);
-
-        //check and update directories again for the current project (in the case we've changed project)
-        updateDirs();
 
         let node = this;
         let group, tab, link;

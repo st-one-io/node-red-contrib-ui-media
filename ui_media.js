@@ -136,7 +136,7 @@ module.exports = function (RED) {
                     }
 
                     let oldpath = files[i].path;
-                    let newpath = path.join(pathBase, files[i].name);
+                    let newpath = path.join(pathBase, sanitizeInput(files[i].name));
 
                     fs.rename(oldpath, newpath, function (err) {
 

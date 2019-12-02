@@ -638,6 +638,7 @@ module.exports = function (RED) {
             format: rawHTML,
             templateScope: "local",
             group: config.group,
+            order: config.order,
             emitOnlyNewValues: false,
             forwardInputMessages: false,
             // define the functions of the widget

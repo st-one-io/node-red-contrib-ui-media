@@ -59,15 +59,9 @@
             return this.name ? "node_label_italic" : "";
         },
         oneditprepare: function () {
-            const bt_category_new = $("#bt-category-new");
             const bt_category_cancel = $('#bt-category-cancel');
-            const bt_category_remove = $('#bt-category-remove');
             const bt_category_save = $('#bt-category-save');
-
-            const bt_media_new = $('#bt-media-new');
             const bt_media_cancel = $('#bt-media-cancel');
-            const bt_media_remove = $('#bt-media-remove');
-            const bt_media_options = $('#bt-media-options');
 
             var divCategory = $('#div-category');
             var divNewCategory = $('#div-new-category');
@@ -380,29 +374,73 @@
 
             $("#bt-copy").click(copyLinkToClipboard);
 
-            bt_category_new.click(function () {
-                input_link.val('');
-                input_new_category.val('');
+            RED.menu.init({
+                id: "btn-category-options",
+                options: [
+                    {
+                        id: "btn-category-new",
+                        label: that._('ui_media.files.label.add-new'),
+                        onselect: function () {
+                            input_link.val('');
+                            input_new_category.val('');
 
-                divCategory.hide();
-                divNewCategory.show();
-                divFile.hide();
-                divNewFile.hide();
-                media_preview.hide();
+                            divCategory.hide();
+                            divNewCategory.show();
+                            divFile.hide();
+                            divNewFile.hide();
+                            media_preview.hide();
 
-                input_new_category.focus();
+                            input_new_category.focus();
+                        },
+                    },
+                    {
+                        id: "btn-category-remove",
+                        label: that._('ui_media.files.label.remove-category'),
+                        onselect: function () {
+                            var value = $('#node-input-category').val();
+
+                            if (!value) return;
+
+                            $("#node-dialog-confirm-remove-category").dialog("open");
+                        },
+                    }
+                ]
             });
+
+            RED.menu.init({
+                id: "btn-media-options",
+                options: [
+                    {
+                        id: "btn-media-new",
+                        label: that._('ui_media.files.label.add-new'),
+                        onselect: function () {
+                            input_link.val('');
+                            $("#node-input-upload").val('');
+                            filesToUpload = null;
+
+                            divFile.hide();
+                            divNewFile.show();
+                            media_preview.hide();
+                        },
+                    },
+                    {
+                        id: "btn-media-remove",
+                        label: that._('ui_media.files.label.remove-media'),
+                        onselect: function () {
+                            var value = $('#node-input-file').val();
+
+                            if (!value) return;
+
+                            $("#node-dialog-confirm-remove-media").dialog("open");
+                        },
+                    }
+                ]
+            });
+
             bt_category_cancel.click(function(){
                 updateCategoryList(input_category.val());
             });
             bt_category_save.click(saveCategory);
-            bt_category_remove.click(function () {
-                var value = $('#node-input-category').val();
-
-                if (!value) return;
-
-                $("#node-dialog-confirm-remove-category").dialog("open");
-            });
 
             input_category.change(updateMediaList);
             input_new_category.keypress(function (e) {
@@ -411,23 +449,7 @@
                 }
             });
 
-            bt_media_new.click(function () {
-                input_link.val('');
-                $("#node-input-upload").val('');
-                filesToUpload = null;
-
-                divFile.hide();
-                divNewFile.show();
-                media_preview.hide();
-            });
             bt_media_cancel.click(updateMediaList);
-            bt_media_remove.click(function() {
-                var value = $('#node-input-file').val();
-
-                if (!value) return;
-
-                $("#node-dialog-confirm-remove-media").dialog("open");
-            });
 
             input_file.change(updateMediaPreview);
 
@@ -594,14 +616,10 @@
                     </select>
                 </div>
                 <div class="btn-group" style="position: absolute; right: 0px; top: 0px;">
-                    <a class="editor-button" data-toggle="dropdown">
+                    <a id="btn-category-options" class="editor-button red-ui-button" data-toggle="dropdown">
                         <i class="fa fa-book"></i>
                         <i class="fa fa-caret-down"></i>
                     </a>
-                    <ul class="dropdown-menu pull-right" role="menu">
-                        <li><a id="bt-category-new" tabindex="-1" href="#" data-i18n="ui_media.files.label.add-new" ></a></li>
-                        <li><a id="bt-category-remove" tabindex="-1" href="#" data-i18n="ui_media.files.label.remove-category"></a></li>
-                    </ul>
                 </div>
             </div>
         </div>
@@ -633,14 +651,10 @@
                     </select>
                 </div>
                 <div class="btn-group" style="position: absolute; right: 0px; top: 0px;">
-                    <a id="bt-media-options" class="editor-button" data-toggle="dropdown">
+                    <a id="btn-media-options" class="editor-button red-ui-button" data-toggle="dropdown">
                         <i class="fa fa-book"></i>
                         <i class="fa fa-caret-down"></i>
                     </a>
-                    <ul class="dropdown-menu pull-right" role="menu">
-                        <li><a id="bt-media-new" tabindex="-1" href="#" data-i18n="ui_media.files.label.add-new"></a></li>
-                        <li><a id="bt-media-remove" tabindex="-1" href="#" data-i18n="ui_media.files.label.remove-media"></a></li>
-                    </ul>
                 </div>
             </div>
         </div>

@@ -24,8 +24,7 @@
   },
   "dependencies": {
     "formidable": "^1.2.1",
-    "mime-types": "^2.1.21",
-    "mkdirp": "^0.5.1",
-    "node-red-dashboard": "^2.15.4"
+    "mime-types": "^2.1.25",
+    "mkdirp": "^0.5.1"
   }
 }

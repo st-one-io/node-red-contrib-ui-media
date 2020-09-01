@@ -23,15 +23,21 @@
         "category": "Category",
         "file": "File",
         "video-options": "Video Options",
-        "run-on-start": "Run on start",
+        "run-on-start": "Autoplay",
         "show-controls": "Show controls",
         "loop": "Loop",
+        "muted": "Muted",
         "preview": "Preview",
         "add-new": "Add new...",
         "remove-category": "Remove category...",
         "remove-media": "Remove media...",
         "tooltip": "Tooltip"
       }
+    },
+    "error": {
+      "no-config": "Invalid node configuration",
+      "no-mimetype": "Missing mimetype information",
+      "undefined-media-type": "Could not determine the media's type"
     }
   }
 }

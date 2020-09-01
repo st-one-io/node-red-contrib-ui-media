@@ -44,6 +44,7 @@
             showcontrols: {value: true},
             loop: {value: true},
             onstart: {value: false},
+            muted: {value: true},
             scope: {value: 'local'},
   	    tooltip: {value: ''}
         },
@@ -565,7 +566,7 @@
         </div>
         <!-- Layout -->
 
-	<!-- Tooltip -->
+	    <!-- Tooltip -->
         <div class="form-row">
            <label for="node-input-tooltip">
            <i class="fa fa-tag"></i> <span data-i18n="ui_media.files.label.tooltip"></span></label>
@@ -577,20 +578,30 @@
         <div class="form-row">
           <div class="form-row">
             <label for="node-input-tosidebar"><span data-i18n="ui_media.files.label.video-options"></span></label>
+            <input type="checkbox" id="node-input-onstart" style="display:inline-block; width:22px; vertical-align:baseline;">
             <label for="node-input-onstart" style="width:70%">
-              <input type="checkbox" id="node-input-onstart" style="display:inline-block; width:22px; vertical-align:baseline;"><span data-i18n="ui_media.files.label.run-on-start"></span>
-            </label>
-          </div>
-          <div class="form-row">
-            <label ></label>
-            <label for="node-input-showcontrols" style="width:70%">
-              <input type="checkbox" id="node-input-showcontrols" style="display:inline-block; width:22px; vertical-align:baseline;"><span data-i18n="ui_media.files.label.show-controls"></span>
+              <span data-i18n="ui_media.files.label.run-on-start"></span>
             </label>
           </div>
           <div class="form-row">
             <label></label>
+            <input type="checkbox" id="node-input-showcontrols" style="display:inline-block; width:22px; vertical-align:baseline;">
+            <label for="node-input-showcontrols" style="width:70%">
+              <span data-i18n="ui_media.files.label.show-controls"></span>
+            </label>
+          </div>
+          <div class="form-row">
+            <label></label>
+            <input type="checkbox" id="node-input-loop" style="display:inline-block; width:22px; vertical-align:baseline;">
             <label for="node-input-loop" style="width:70%">
-              <input type="checkbox" id="node-input-loop" style="display:inline-block; width:22px; vertical-align:baseline;"><span data-i18n="ui_media.files.label.loop"></span>
+              <span data-i18n="ui_media.files.label.loop"></span>
+            </label>
+          </div>
+          <div class="form-row">
+            <label></label>
+            <input type="checkbox" id="node-input-muted" style="display:inline-block; width:22px; vertical-align:baseline;">
+            <label for="node-input-muted" style="width:70%">
+              <span data-i18n="ui_media.files.label.muted"></span>
             </label>
           </div>
         </div>
@@ -719,26 +730,29 @@
             <span class="property-type">object | string | Buffer</span>
         </dt>
         <dd>
-            Selects which media will be displayed. It should be a string exactly 
-            like the <i>Link</i> field displays on the configuration panel, an
-            object with the <code>category</code> and <code>name</code> properties,
-            or a Buffer, whose content will be displayed according to the 
-            <code>mimetype</code> specified
+            Selects which media will be displayed and its configurations. It 
+            should be a string exactly like the <i>Link</i> field displays on 
+            the configuration panel, an object with the <code>category</code> 
+            and <code>name</code> properties, or a Buffer, whose content will 
+            be displayed according to the <code>mimetype</code> specified
 
             <h5>Examples:</h5>
-            <pre>
-{
-    payload: "category/file name"
-}
-            </pre>
-            <pre>
-{
-    payload: {
-        category: "category", 
-        name: "file name"
-    } 
-}
-            </pre>
+<pre>"category/file_name"</pre>
+<pre>{
+  category: "category", 
+  name: "file_name"
+}</pre>
+
+            When <code>payload</code> is an object, the following properties are 
+            also accepted, <b>overriding</b> what has been set in the node (that 
+            is, all new media from now on will take this configuration until the 
+            flow is deployed/restarted): 
+            <ul>
+                <li><code>onstart</code></li>
+                <li><code>loop</code></li>
+                <li><code>controls</code></li>
+                <li><code>muted</code></li>
+            </ul>
         </dd>
 
         <dt>src 
@@ -767,25 +781,25 @@
           <span class="property-type">boolean</span>
         </dt>
         <dd>
-            When playing a video, sending a message with the <code>play</code>
-            property allows the video to be played or paused, whether its value 
-            is <code>true</code> or <code>false</code>
+            When the media is a video, sending a message with <code>play</code>
+            as <code>false</code> pauses the video, and the value <code>true</code>
+            resumes the playback.
         </dd>
 
-        <dt>onstart
-            <span class="property-type">boolean</span>
+        <dt>mute
+          <span class="property-type">boolean</span>
         </dt>
         <dd>
-            Controls whether a video should start playing as soon as loaded.
-            Overrides the <i>Run on start</i> option set on the configuration panel
+            When the media is a video, controls whether the audio should be muted or not.
         </dd>
 
         <dt>loop
             <span class="property-type">boolean</span>
         </dt>
         <dd>
-            Controls whether a video should play in loop
-            Overrides the <i>Loop</i> option set on the configuration panel
+            Controls whether the currently playing video should play in loop. Does not
+            override the node's configuration as the <code>msg.payload</code> one, and
+            does not restart the playback when changed.
         </dd>
 
         <dt>controls
@@ -793,8 +807,8 @@
         </dt>
         <dd>
             Controls whether the video control buttons (like play button, volume, etc) 
-            should be displayed. Overrides the <i>Show controls</i> option set on the 
-            configuration panel
+            should be displayed. Does not override the node's configuration as the 
+            <code>msg.payload</code> one, and does not restart the playback when changed.
         </dd>
 
         <dt>mimetype

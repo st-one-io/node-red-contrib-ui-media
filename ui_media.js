@@ -175,7 +175,7 @@ module.exports = function (RED) {
      */
     function createCategory(req, res) {
         let dirCategory = path.join(pathDir, sanitizeInput(req.params.category));
-        mkdirp(dirCategory).then(() =>{
+        mkdirp(dirCategory).then(() => {
             restListCategories(req, res);
         }).catch(err => {
             res.status(500).send(err);
@@ -390,14 +390,18 @@ module.exports = function (RED) {
         let node = this;
         let group, tab, link;
         let layout = config.layout || 'adjust';
+        // whether we need to re-render/update the HTML template
+        let updateHTML = true;
 
         group = RED.nodes.getNode(config.group);
         if (!group) {
+            node.error(RED._("ui_media.error.no-config"));
             return;
         }
 
         tab = RED.nodes.getNode(group.config.tab);
         if (!tab) {
+            node.error(RED._("ui_media.error.no-config"));
             return;
         }
 
@@ -410,12 +414,9 @@ module.exports = function (RED) {
             link = urlPath.join(httpRoot, 'uimedia', config.category, config.file);
         }
 
-        // create the widget's HTML snippet
-        var rawHTML = String.raw`<div class="bgimg"></div>`;
-
         /**
          * Check for that we have a config instance and that our config instance has a group selected, otherwise report an error
-         * @param {string} config - configs with the layout to be set
+         * @param {object} config - configs with the layout to be set
          * @param {string} path - the layout configuration fo the media to be shown
          */
         function processImageLayout(config, path) {
@@ -525,7 +526,7 @@ module.exports = function (RED) {
 
                 default: {
                     HTML = String.raw`
-                        <div id="${div_name}" style="width:100%; height: auto;max-height: 100%;margin: 0, auto"title="${config.tooltip}">
+                        <div id="${div_name}" style="width:100%; height: auto;max-height: 100%;margin: 0, auto" title="${config.tooltip}">
 
                            <img src="${path}" align="middle" width="100%">
                         </div>`;
@@ -537,64 +538,59 @@ module.exports = function (RED) {
         }
 
         /**
-           * Check for that we have a config instance and that our config instance has a group selected, otherwise report an error
-             * @param {string} path - the layout configuration fo the media to be shown
+         * Check for that we have a config instance and that our config instance has a group selected, otherwise report an error
+         * @param {string} path - the layout configuration fo the media to be shown
          * @param {boolean} controls - 'true' if controls must be shown, 'false' if mustn't
-         * @param {boolean} onstart - 'true' if video must star when load , 'false' if mustn't
+         * @param {boolean} onstart - 'true' if video must start when load , 'false' if mustn't
          * @param {boolean} loop - 'true' if video must loop when finilshed, 'false' if mustn't
-             */
-        function processVideoLayout(path, controls, onstart, loop) {
+         * @param {boolean} muted whether the video should start muted
+         */
+        function processVideoLayout(path, controls, onstart, loop, muted) {
             var controls_string = "";
             var onstart_string = "";
             var loop_string = "";
+            var muted_string = "";
 
             if (controls) { controls_string = " controls" };
             if (onstart) { onstart_string = " autoplay" };
             if (loop) { loop_string = " loop=\"true\"" };
+            if (muted) { muted_string = " muted" };
 
-            // create a div name based on the path
-            var video_name = path.split(".")[0];
-            video_name = video_name.replace(/ /g, '');
-            video_name = video_name.concat("-video");
-            video_name = video_name.split("/")[3];
+            var video_name = `video_${(Math.random() * 0xffffffff).toString(16)}`
             var HTML = String.raw`
                 <script>
-                  // To play/pause the video we must watch for the right msgs
-                  scope.$watch('msg', function(newMsg, oldMsg, scope){
-                    var media = document.getElementById("${video_name}");
-                    if (newMsg.play) {
-                      media.play();
-                    } else {
-                      media.pause();
-                    }
-                  });
-
-		  // Now we add the current style to the header section
-		  var head = document.head;
-		  var style = document.createElement('style');
-		  var css = "#${video_name} { width: 100%; height: auto; max-height: 98%;position: relative; top: 50%; transform: translateY(-50%);}"
-
-		  head.appendChild(style);
-		  style.type = 'text/css';
-		  if (style.styleSheet){
-			  style.styleSheet.cssText = css;
-		  }else {
-			  style.appendChild(document.createTextNode(css));
-		  }
+                    // To play/pause the video we must watch for the right msgs
+                    scope.$watch('msg', function(newMsg, oldMsg, scope){
+                        var media = document.getElementById("${video_name}");
+                        if (newMsg.hasOwnProperty('play')){
+                            newMsg.play ? media.play() : media.pause();
+                        }
+                        if (newMsg.hasOwnProperty('mute')){
+                            media.muted = newMsg.mute;
+                        }
+                        if (newMsg.hasOwnProperty('loop')){
+                            media.loop = newMsg.loop;
+                        }
+                        if (newMsg.hasOwnProperty('controls')){
+                            media.controls = newMsg.controls;
+                        }
+                    });
                 </script>
 
-                <video id="${video_name}"src="${path}" ${controls_string}
-                ${loop_string} ${onstart_string}></video>
-                 `;
+                <video id="${video_name}" 
+                    src="${path}" 
+                    style="width: 100%; height: auto; max-height: 98%; position: relative; top: 50%; transform: translateY(-50%);"
+                    ${controls_string} ${loop_string} ${onstart_string} ${muted_string}>
+                </video>`;
 
             return HTML;
         }
 
         /**
          * Check for that we have a config instance and that our config instance has a group selected, otherwise report an error
-             * @param {object} url - The file path
-             * @returns {string} 'img' if the file has a image type and 'video' if the file has a video type
-             */
+         * @param {object} url - The file path
+         * @returns {string} 'img' if the file has a image type and 'video' if the file has a video type
+         */
         function getFileType(url) {
             var type = String(mime.lookup(url));
 
@@ -607,9 +603,9 @@ module.exports = function (RED) {
 
         /**
          * Check for that we have a config instance and that our config instance has a group selected, otherwise report an error
-         * @param {object} path - The file path
-         * @param {string} extension - The file's extension
-         * @param {string} layout - The image layout to be set
+         * @param {object} config - The file path
+         * @param {string} path - The file's extension
+         * @param {string} type - The image layout to be set
          * @returns {string} Widget's HTML snippet
          */
         function HTML(path, type, config) {
@@ -618,8 +614,9 @@ module.exports = function (RED) {
             if ((/(image)$/i).test(type)) {
                 raw = processImageLayout(config, path);
             } else if ((/(video)$/i).test(type)) {
-                raw = processVideoLayout(path, config.showcontrols, config.onstart, config.loop);
+                raw = processVideoLayout(path, config.showcontrols, config.onstart, config.loop, config.muted);
             }
+
             return raw;
         }
 
@@ -629,7 +626,7 @@ module.exports = function (RED) {
             node: node,
             width: config.width,
             height: config.height,
-            format: rawHTML,
+            format: '<div class="bgimg"></div>',
             templateScope: "local",
             group: config.group,
             order: config.order,
@@ -640,40 +637,51 @@ module.exports = function (RED) {
                 return value;
             },
             beforeEmit: function (msg, value) {
+                let retVal = { msg };
+
                 // process current layout
                 if (msg.layout !== undefined) {
                     layout = msg.layout;
+                    updateHTML = true;
                 }
-                var fileType;
+
                 // process current media
-                if (msg.src !== undefined) {
+                if (typeof msg.src === 'string') {
+                    updateHTML = true;
+
                     link = msg.src;
-                } else if (msg.payload !== undefined) {
+                } else if (msg.payload) {
+                    updateHTML = true;
+
                     if (typeof msg.payload == 'string') {
                         link = msg.payload ? urlPath.join(httpRoot, 'uimedia', msg.payload) : '';
                     } else if (Buffer.isBuffer(msg.payload)) {
-                        link = "data:" + msg.mimetype + ";base64," + msg.payload.toString('base64');
+                        // we need the mimetype to be explicitly defined when the payload is a Buffer
+                        if (typeof msg.mimetype !== 'string') {
+                            node.error(RED._("ui_media.error.no-mimetype"));
+                            return;
+                        }
+                        link = `data:${msg.mimetype};base64,${msg.payload.toString('base64')}`;
                     } else if (msg.payload.category && msg.payload.name) {
                         link = urlPath.join(httpRoot, 'uimedia', msg.payload.category, msg.payload.name);
-                    } else if (msg.payload.onstart || msg.payload.loop || msg.payload.controls) {
-                        config.onstart = JSON.parse(msg.payload.onstart);
-                        config.loop = JSON.parse(msg.payload.loop);
-                        config.showcontrols = JSON.parse(msg.payload.controls);
                     }
+
+                    // process media configuration
+                    if (msg.payload.onstart !== undefined) config.onstart = !!JSON.parse(msg.payload.onstart);
+                    if (msg.payload.loop !== undefined) config.loop = !!JSON.parse(msg.payload.loop);
+                    if (msg.payload.controls !== undefined) config.showcontrols = !!JSON.parse(msg.payload.controls);
+                    if (msg.payload.muted !== undefined) config.muted = !!JSON.parse(msg.payload.muted);
                 }
 
-                if (msg.mimetype == undefined) {
-                    if (fileType == undefined) fileType = getFileType(link);
-                } else {
-                    fileType = msg.mimetype.split('/')[0];
-                    if (!fileType) node.error("Missing mimetype");
+                if (updateHTML) {
+                    let fileType = (typeof msg.mimetype === 'string') ? msg.mimetype.split('/')[0] : getFileType(link);
+                    if (link && !fileType) node.error(RED._("ui_media.error.undefined-media-type"));
+
+                    retVal.format = HTML(link, fileType, config);
+                    updateHTML = false;
                 }
 
-                rawHTML = HTML(link, fileType, config);
-                return {
-                    format: rawHTML,
-                    msg: msg
-                }
+                return retVal;
             },
             beforeSend: function (msg, orig) {
                 if (orig) {

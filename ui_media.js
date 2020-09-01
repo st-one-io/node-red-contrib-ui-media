@@ -37,7 +37,7 @@ module.exports = function (RED) {
         let projects = RED.settings.get("projects");
         let userDir = RED.settings.userDir;
 
-        if (editorTheme && projects && editorTheme.projects && editorTheme.projects.enabled) {
+        if (editorTheme && projects && editorTheme.projects && editorTheme.projects.enabled && projects.activeProject) {
             // create the paths
             pathDir = path.resolve(userDir, "projects", String(projects.activeProject), "ui-media", "lib");
             pathUpload = path.resolve(userDir, "projects", String(projects.activeProject), "ui-media", "upload");

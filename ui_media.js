@@ -49,13 +49,13 @@ module.exports = function (RED) {
 
         httpRoot = RED.settings.get('httpAdminRoot') || RED.settings.get('httpRoot') || '/';
 
-        mkdirp(pathDir, (err) => {
+        mkdirp(pathDir).catch((err) => {
             if (err) {
                 RED.log.error(`Could not create library directory [${pathDir}]: ${err}`);
             }
         });
 
-        mkdirp(pathUpload, (err) => {
+        mkdirp(pathUpload).catch((err) => {
             if (err) {
                 RED.log.error(`Could not create upload directory [${pathUpload}]: ${err}`);
             }
@@ -97,15 +97,7 @@ module.exports = function (RED) {
 
             var controlFiles = filesUpload;
 
-            mkdirp(pathBase, (err) => {
-
-                if (err) {
-                    error.push({
-                        cod: 500,
-                        msg: err
-                    });
-                    return;
-                }
+            mkdirp(pathBase).then(() => {
 
                 for (var i = 0; i < filesUpload; i++) {
 
@@ -172,6 +164,8 @@ module.exports = function (RED) {
                         }
                     });
                 }
+            }).catch(err => {
+                res.status(500).send(err).end();
             });
         });
     }
@@ -181,13 +175,10 @@ module.exports = function (RED) {
      */
     function createCategory(req, res) {
         let dirCategory = path.join(pathDir, sanitizeInput(req.params.category));
-        mkdirp(dirCategory, (err) => {
-            if (err) {
-                res.status(500).send(err);
-                return;
-            }
-
+        mkdirp(dirCategory).then(() =>{
             restListCategories(req, res);
+        }).catch(err => {
+            res.status(500).send(err);
         });
 
     }

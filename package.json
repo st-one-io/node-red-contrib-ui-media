@@ -23,8 +23,8 @@
     "url": "https://github.com/netsmarttech/node-red-contrib-ui-media.git"
   },
   "dependencies": {
-    "formidable": "^1.2.1",
-    "mime-types": "^2.1.25",
-    "mkdirp": "^0.5.1"
+    "formidable": "^1.2.2",
+    "mime-types": "^2.1.27",
+    "mkdirp": "^1.0.4"
   }
 }

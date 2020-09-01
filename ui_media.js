@@ -282,7 +282,13 @@ module.exports = function (RED) {
                 return;
             }
 
-            res.sendFile(pathImage);
+            try {
+                res.sendFile(pathImage);
+            } catch (e) {
+                /* handles errors of sendFile "gracefully" instead of 
+                potentially crashing node-red */
+                res.status(500).json(e).end();
+            }
         });
     }
 

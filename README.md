@@ -2,7 +2,7 @@ node-red-contrib-ui-media
 =====================
 A Node-RED UI node to show media files (image and video) on the dashboard.
 
-This node was created by [Smart-Tech](https://netsmarttech.com) as part of the [ST-One](https://netsmarttech.com/page/st-one) project.
+This node was created as part of the [ST-One](https://st-one.io) project.
 
 Install
 -----------
@@ -40,4 +40,4 @@ Please share your ideas and experiences on the [Node-RED forum](https://discours
 
 License
 -----------
-Copyright 2019 Smart-Tech, [Apache 2.0 license](LICENSE).
+Copyright 2016-2020 ST-One Ltda., [Apache 2.0 license](LICENSE).

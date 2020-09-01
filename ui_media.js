@@ -23,7 +23,6 @@ var path = require('path');
 var urlPath = path.posix;
 var mkdirp = require('mkdirp');
 var mime = require('mime-types');
-var os = require('os');
 
 module.exports = function (RED) {
 
@@ -40,12 +39,12 @@ module.exports = function (RED) {
 
         if (editorTheme && projects && editorTheme.projects && editorTheme.projects.enabled) {
             // create the paths
-            pathDir = path.join(userDir, "projects", String(projects.activeProject), "ui-media", "lib");
-            pathUpload = path.join(userDir, "projects", String(projects.activeProject), "ui-media", "upload");
+            pathDir = path.resolve(userDir, "projects", String(projects.activeProject), "ui-media", "lib");
+            pathUpload = path.resolve(userDir, "projects", String(projects.activeProject), "ui-media", "upload");
         } else {
             // create paths without the projects directory
-            pathDir = path.join(userDir, "lib", "ui-media", "lib");
-            pathUpload = path.join(userDir, "lib", "ui-media", "upload");
+            pathDir = path.resolve(userDir, "lib", "ui-media", "lib");
+            pathUpload = path.resolve(userDir, "lib", "ui-media", "upload");
         }
 
         httpRoot = RED.settings.get('httpAdminRoot') || RED.settings.get('httpRoot') || '/';
@@ -282,8 +281,6 @@ module.exports = function (RED) {
                 res.status(404).json(err).end();
                 return;
             }
-
-            if ((os.platform()) === "win32") pathImage = "C:" + pathImage;
 
             res.sendFile(pathImage);
         });
